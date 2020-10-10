@@ -3,7 +3,7 @@ from django.urls import path
 from django.urls import include, path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from trips.views import SignUpView, LogInView
+from trips.views import SignUpView, LogInView, TripView
 
 
 urlpatterns = [

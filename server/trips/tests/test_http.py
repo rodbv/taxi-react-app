@@ -1,14 +1,17 @@
-import base64  # new
-import json  # new
+import base64
+import json
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
+from trips.serializers import TripSerializer, UserSerializer
+from trips.models import Trip
+
 PASSWORD = 'pAssw0rd!'
 
 
-def create_user(username='user@example.com', password=PASSWORD):  # new
+def create_user(username='user@example.com', password=PASSWORD):
     return get_user_model().objects.create_user(
         username=username,
         first_name='Test',
@@ -21,7 +24,7 @@ class AuthenticationTest(APITestCase):
     # Function collapsed for clarity.
     def test_user_can_sign_up(self): ...
 
-    def test_user_can_log_in(self):  # new
+    def test_user_can_log_in(self):
         user = create_user()
         response = self.client.post(reverse('log_in'), data={
             'username': user.username,
@@ -40,3 +43,26 @@ class AuthenticationTest(APITestCase):
         self.assertEqual(payload_data['username'], user.username)
         self.assertEqual(payload_data['first_name'], user.first_name)
         self.assertEqual(payload_data['last_name'], user.last_name)
+
+
+class HttpTripTest(APITestCase):
+    def setUp(self):
+        user = create_user()
+        response = self.client.post(reverse('log_in'), data={
+            'username': user.username,
+            'password': PASSWORD,
+        })
+        self.access = response.data['access']
+
+    def test_user_can_list_trips(self):
+        trips = [
+            Trip.objects.create(pick_up_address='A', drop_off_address='B'),
+            Trip.objects.create(pick_up_address='B', drop_off_address='C')
+        ]
+        response = self.client.get(reverse('trip:trip_list'),
+                                   HTTP_AUTHORIZATION=f'Bearer {self.access}'
+                                   )
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        exp_trip_ids = [str(trip.id) for trip in trips]
+        act_trip_ids = [trip.get('id') for trip in response.data]
+        self.assertCountEqual(exp_trip_ids, act_trip_ids)

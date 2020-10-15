@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Formik } from 'formik';
 import { Breadcrumb, Button, Card, Col, Form, Row } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 function LogIn(props) {
+  const [isSubmitted, setSubmitted] = useState(false);
+  const onSubmit = (values, actions) => setSubmitted(true);
+
+  if (isSubmitted) {
+    return <Redirect to="/" />;
+  }
   return (
     <>
       <Row>
@@ -24,7 +30,7 @@ function LogIn(props) {
                   username: '',
                   password: '',
                 }}
-                onSubmit={console.log}
+                onSubmit={onSubmit}
               >
                 {({ handleChange, handleSubmit, values }) => (
                   <Form noValidate onSubmit={handleSubmit}>

@@ -20,10 +20,20 @@ function App() {
       const response = await axios.post(url, { username, password })
       window.localStorage.setItem('taxi.auth', JSON.stringify(response.data))
       setLoggedIn(true)
+
+      return { response, isError: false }
     } catch (error) {
       console.error(error)
+
+      return { response: error, isError: true }
     }
   }
+
+  const logOut = () => {
+    window.localStorage.removeItem('taxi.auth')
+    setLoggedIn(false)
+  }
+
   return (
     <div>
       <Navbar bg="light" expand="lg" variant="light">
@@ -34,7 +44,9 @@ function App() {
         <Navbar.Collapse>
           {isLoggedIn && (
             <Form inline className="ml-auto">
-              <Button type="button">Log out</Button>
+              <Button type="button" onClick={logOut}>
+                Log out
+              </Button>
             </Form>
           )}
         </Navbar.Collapse>

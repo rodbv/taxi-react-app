@@ -1,12 +1,30 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Formik } from 'formik'
-import { Breadcrumb, Button, Card, Col, Form, Row } from 'react-bootstrap'
+import {
+  Alert,
+  Breadcrumb,
+  Button,
+  Card,
+  Col,
+  Form,
+  Row,
+} from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
-function LogIn(props) {
+function LogIn({ logIn }) {
   const onSubmit = async (values, actions) => {
     try {
-      await props.logIn(values.username, values.password)
+      const { response, isError } = await logIn(
+        values.username,
+        values.password
+      )
+
+      if (isError) {
+        const data = response.response.data
+        for (const value in data) {
+          actions.setFieldError(value, data[value].join(' '))
+        }
+      }
     } catch (error) {
       console.error(error)
     }
@@ -34,29 +52,45 @@ function LogIn(props) {
                 }}
                 onSubmit={onSubmit}
               >
-                {({ handleChange, handleSubmit, values }) => (
-                  <Form noValidate onSubmit={handleSubmit}>
-                    <Form.Group controlId="username">
-                      <Form.Label>Username:</Form.Label>
-                      <Form.Control
-                        name="username"
-                        onChange={handleChange}
-                        value={values.username}
-                      />
-                    </Form.Group>
-                    <Form.Group controlId="password">
-                      <Form.Label>Password:</Form.Label>
-                      <Form.Control
-                        name="password"
-                        onChange={handleChange}
-                        type="password"
-                        value={values.password}
-                      />
-                    </Form.Group>
-                    <Button block type="submit" variant="primary">
-                      Log in
-                    </Button>
-                  </Form>
+                {({
+                  errors,
+                  handleChange,
+                  handleSubmit,
+                  isSubmitting,
+                  values,
+                }) => (
+                  <React.Fragment>
+                    {'__all__' in errors && (
+                      <Alert variant="danger">{errors['__all__']}</Alert>
+                    )}
+                    <Form noValidate onSubmit={handleSubmit}>
+                      <Form.Group controlId="username">
+                        <Form.Label>Username:</Form.Label>
+                        <Form.Control
+                          name="username"
+                          onChange={handleChange}
+                          value={values.username}
+                        />
+                      </Form.Group>
+                      <Form.Group controlId="password">
+                        <Form.Label>Password:</Form.Label>
+                        <Form.Control
+                          name="password"
+                          onChange={handleChange}
+                          type="password"
+                          value={values.password}
+                        />
+                      </Form.Group>
+                      <Button
+                        block
+                        disabled={isSubmitting}
+                        type="submit"
+                        variant="primary"
+                      >
+                        Log in
+                      </Button>
+                    </Form>
+                  </React.Fragment>
                 )}
               </Formik>
             </Card.Body>

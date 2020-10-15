@@ -4,9 +4,10 @@ jobs:
   cypress-run:
     runs-on: ubuntu-16.04
     steps:
-      - working-directory: client
       - uses: actions/checkout@v1
       - uses: cypress-io/github-action@v2
         with:
           browser: chrome
           headless: true
+
+ 

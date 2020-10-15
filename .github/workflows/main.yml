@@ -10,5 +10,6 @@ jobs:
           browser: chrome
           headless: true
           working-directory: client
+          start: npm start
 
  

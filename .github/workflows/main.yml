@@ -9,5 +9,6 @@ jobs:
         with:
           browser: chrome
           headless: true
+          working-directory: client
 
  
